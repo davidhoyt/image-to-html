@@ -102,25 +102,48 @@ object Main extends App {
     }
 
 
-    output.println("<html>\n<body>\n\n")
+    //output.println("<html>\n<body>\n\n")
 
-    for {
-      row <- 0 until result.length
-      col <- 0 until result(row).length
+    var row = 0
+    var col = 0
+    var argb = 0
+    var colWidth = 0
+    var colRight = 0
+    var isFirstRow = false
+    var startOfNewRow = false
+    var b, g, r, a: Short = 0
+    var o: Double = 0.0
+    while(row < result.length) {
       isFirstRow = row == 0
-      startOfNewRow = col == 0
-      argb = result(row)(col)
-      b = ((argb >>  0) & 0xff).toShort //blue
-      g = ((argb >>  8) & 0xff).toShort //green
-      r = ((argb >> 16) & 0xff).toShort //red
-      a = ((argb >> 24) & 0xff).toShort //alpha
-      o = a.toDouble / 255.0            //opacity
-    } {
-      output.print(s"<div style='width: 1px; height: 1px; background-color: rgba($r, $g, $b, $o); float: left;'></div>")
-      if (startOfNewRow)
-        output.println(s"<div style='clear:both;'></div>")
+
+      while(col < result(row).length) {
+        argb = result(row)(col)
+        startOfNewRow = col == 0
+        colWidth = 1
+        colRight = col
+
+        while (colRight < result(row).length - 1 && result(row)(colRight + 1) == argb)
+          colRight += 1
+        colWidth = colRight - col + 1
+
+        argb = result(row)(col)
+        b = ((argb >>  0) & 0xff).toShort //blue
+        g = ((argb >>  8) & 0xff).toShort //green
+        r = ((argb >> 16) & 0xff).toShort //red
+        a = ((argb >> 24) & 0xff).toShort //alpha
+        o = a.toDouble / 255.0            //opacity
+
+        output.print(s"<div style='width:${colWidth}px;height:1px;background-color:rgba($r,$g,$b,$o);float:left;'></div>")
+
+        col += colWidth
+      }
+
+      output.println(s"<div style='clear:both;'></div>")
+
+      col = 0
+      row += 1
     }
 
-    output.println("\n\n</body>\n</html>")
+    //output.println("\n\n</body>\n</html>")
   }
 }
