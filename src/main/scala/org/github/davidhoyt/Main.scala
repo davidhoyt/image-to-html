@@ -103,6 +103,17 @@ object Main extends App {
 
 
     //output.println("<html>\n<body>\n\n")
+    output.println("<table border='0' cellpadding='0' cellspacing='0'>")
+
+
+    val blend = 0xffffff
+    //val blend_a = ((blend >> 24) & 0xff).toShort //alpha
+    val blend_r = ((blend >> 16) & 0xff).toShort //red
+    val blend_g = ((blend >>  8) & 0xff).toShort //green
+    val blend_b = ((blend >>  0) & 0xff).toShort //blue
+
+    def blendColors(alpha: Double, color: Short, blend_color: Short): Short =
+      ((blend_color * (1.0D - alpha)) + (color * alpha)).toShort
 
     var row = 0
     var col = 0
@@ -116,6 +127,8 @@ object Main extends App {
     while(row < result.length) {
       isFirstRow = row == 0
 
+      output.println("  <tr>")
+
       while(col < result(row).length) {
         argb = result(row)(col)
         startOfNewRow = col == 0
@@ -127,23 +140,32 @@ object Main extends App {
         colWidth = colRight - col + 1
 
         argb = result(row)(col)
-        b = ((argb >>  0) & 0xff).toShort //blue
-        g = ((argb >>  8) & 0xff).toShort //green
-        r = ((argb >> 16) & 0xff).toShort //red
+
         a = ((argb >> 24) & 0xff).toShort //alpha
         o = a.toDouble / 255.0            //opacity
 
-        output.print(s"<div style='width:${colWidth}px;height:1px;background-color:rgba($r,$g,$b,$o);float:left;'></div>")
+        r = ((argb >> 16) & 0xff).toShort //red
+        g = ((argb >>  8) & 0xff).toShort //green
+        b = ((argb >>  0) & 0xff).toShort //blue
+
+        val hex = f"#${blendColors(o, r, blend_r)}%02x${blendColors(o, g, blend_g)}%02x${blendColors(o, b, blend_b)}%02x"
+
+        //output.print(s"<div style='width:${colWidth}px;height:1px;background-color:rgba($r,$g,$b,$o);float:left;'></div>")
+        //output.print(s"<td style='background-color: rgba($r,$g,$b,$o); width: 1px; height: 1px;' colspan='$colWidth' width='1' height='1'></td>")
+        output.println(s"    <td bgcolor='$hex' colspan='$colWidth' width='1' height='1'></td>")
+        //output.println(s"    <td colspan='$colWidth' style='background-color: $hex; width: ${colWidth}px; height: 1px;'></td>")
 
         col += colWidth
       }
 
-      output.println(s"<div style='clear:both;'></div>")
+      //output.println(s"<div style='clear:both;'></div>")
+      output.println(s"  </tr>")
 
       col = 0
       row += 1
     }
 
+    output.println(s"</table>")
     //output.println("\n\n</body>\n</html>")
   }
 }
