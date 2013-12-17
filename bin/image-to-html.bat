@@ -12,7 +12,7 @@ cd /d "%DIR%"
 
 
 
-java -jar image-to-html-0.0.1-SNAPSHOT.jar
+java -jar image-to-html-assembly-0.0.1-SNAPSHOT.jar %*
 
 
 
